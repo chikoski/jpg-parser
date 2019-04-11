@@ -1,0 +1,18 @@
+{
+  "name": "jpg-parser",
+  "version": "0.1.0",
+  "description": "A parser for JPG files",
+  "main": "dist/index.js",
+  "scripts": {
+    "build::ts": "tsc -b tsconfig.json --watch"
+  },
+  "keywords": [
+    "JPEG",
+    "Parser"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^3.4.3"
+  }
+}
