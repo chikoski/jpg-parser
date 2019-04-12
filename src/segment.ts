@@ -1,11 +1,9 @@
+export const identifier = 0xFF;
+
 export class JPEGSegment {
-  static Identifier = 0xFF;
-  mData: DataView;
+  readonly data: DataView;
   constructor(data: DataView) {
-    this.mData = data;
-  }
-  get data() {
-    return this.mData;
+    this.data = data;
   }
   get marker() {
     return this.data.getUint8(1);
