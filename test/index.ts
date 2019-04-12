@@ -3,7 +3,7 @@ const path = require('path');
 import * as jpg from '../src/index';
 
 function showError(error) {
-  console.error(error + '');
+  console.error(error);
 }
 
 function parse(data: DataView) {
