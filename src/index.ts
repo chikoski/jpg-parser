@@ -1,9 +1,8 @@
 import * as segment from './segment';
 
 export class JPEGFile {
-  segments: Array<segment.JPEGSegment>;
-  data: DataView;
-
+  readonly segments: Array<segment.JPEGSegment>;
+  readonly data: DataView;
   constructor(segments, data) {
     this.segments = segments;
     this.data = data;
@@ -43,7 +42,7 @@ function parseHeader(data, offset = 0) {
   const segments = [];
   for (let size = 1; offset < data.byteLength; offset = offset + size) {
     const id = data.getUint8(offset);
-    if (id === segment.JPEGSegment.Identifier) {
+    if (id === segment.identifier) {
       const type = data.getUint8(offset + 1);
       const klass = resolve(type);
       size = 2;
@@ -53,16 +52,15 @@ function parseHeader(data, offset = 0) {
       const slice = new DataView(data.buffer, data.byteOffset + offset, size);
       segments.push(new klass(slice));
       if (klass === segment.SOSSegment) {
-        return { offset, segments };
+        return {offset, segments};
       }
     }
   }
-  return { offset, segments };
+  return {offset, segments};
 }
 
-
 export function parse(data) {
-  const { offset, segments } = parseHeader(data);
+  const {offset, segments} = parseHeader(data);
   let end = data.byteLength - 2;
   for (; offset < end; end = end - 1) {
     if (data.getUint16(end) === 0xFFD9) {
@@ -70,8 +68,8 @@ export function parse(data) {
     }
   }
   segments.push(new segment.EOISegment(
-    new DataView(data.buffer, data.byteOffset + end, 2)));
+      new DataView(data.buffer, data.byteOffset + end, 2)));
   const scanArea =
-    new DataView(data.buffer, data.byteOffset + offset, end - offset);
+      new DataView(data.buffer, data.byteOffset + offset, end - offset);
   return new JPEGFile(segments, scanArea);
 };
