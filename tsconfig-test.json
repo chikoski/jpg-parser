@@ -5,7 +5,8 @@
     "removeComments": true,
     "outDir": "./dist/test"
   },
-  "files": [
-    "./test/index.ts"
+  "includes": [
+    "./test/**/*",
+    "./src/**/*"
   ]
 }
