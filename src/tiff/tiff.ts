@@ -1,3 +1,5 @@
+import * as Tag from "./tag";
+
 const LITTLE_ENDIAN = 0x4949;
 const MAGIC = 0x002A;
 
@@ -38,14 +40,8 @@ class Tiff {
   }
 }
 
-class Tag {
-  debugStrng() {
-    return `TAG`;
-  }
-}
-
 class IFD {
-  readonly tags: Array<Tag>;
+  readonly tags: Array<Tag.Tag>;
   readonly nextIFD: number;
   constructor(tags, nextIFD) {
     this.tags = tags;
@@ -53,29 +49,24 @@ class IFD {
   }
   debugString() {
     const tags = this.tags
-                     .map((tag, index) => {
-                       return `#${index}: ${tag.debugStrng()}`;
-                     })
-                     .join('\n');
+      .map((tag, index) => {
+        return `#${index}: ${tag.debugStrng()}`;
+      })
+      .join('\n');
     return `IFD (${this.tags.length} tags inside)\n${tags}`;
   }
 }
 
-function parseTag(data, offset, endian) {
-  return new Tag();
-}
-
-const TAG_SIZE = 12;
 
 function parseIFD(data, offset, endian = false) {
   const numberOfTags = data.getUint16(offset, endian);
   const tags = [];
 
   for (let i = 0; i < numberOfTags; i = i + 1) {
-    const tag = parseTag(data, offset + 2 + i * TAG_SIZE, endian);
-    tags.push(tag);
+    const t = Tag.parse(data, offset + 2 + i * Tag.size, endian);
+    tags.push(t);
   }
-  const nextIFD = data.getUint32(offset + 2 + TAG_SIZE * numberOfTags);
+  const nextIFD = data.getUint32(offset + 2 + Tag.size * numberOfTags);
   return new IFD(tags, nextIFD);
 }
 
@@ -88,6 +79,12 @@ function parseHeader(data, offset = 0) {
 
 export function parse(data, offset = 0) {
   const header = parseHeader(data, offset);
-  const primaryIFD = parseIFD(data, offset + header.nextIFD, header.endian);
-  return new Tiff(header, [primaryIFD]);
+  const ifdlist = [];
+  for (let start = header.nextIFD + offset; start < data.byteLength;) {
+    const ifd = parseIFD(data, start, header.endian);
+    ifdlist.push(ifd);
+    start = ifd.nextIFD + offset;
+    console.log(`${start < data.byteLength}`);
+  }
+  return new Tiff(header, ifdlist);
 }
