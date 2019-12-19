@@ -4,18 +4,21 @@
   "description": "A parser for JPG files",
   "main": "dist/index.js",
   "scripts": {
-    "build::ts": "tsc -b tsconfig.json --watch",
-    "build::test": "tsc -b tsconfig-test.json --watch",
-    "test": "node dist/test/test/index.js"
+    "build": "webpack --config webpack.config.cjs",
+    "dev": "webpack --watch --config webpack.config.cjs",
+    "test": "node ./test/index.js"
   },
   "keywords": [
-    "JPEG",
-    "Parser"
+    "JPEG"
   ],
-  "author": "",
+  "author": "N.Shimizu <chikoski@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^3.4.3",
-    "@types/node": "^11.13.4"
-  }
+    "@types/node": "^11.15.3",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.3",
+    "webpack": "^4.41.4",
+    "webpack-cli": "^3.3.10"
+  },
+  "type": "module"
 }
