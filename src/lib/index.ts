@@ -1,4 +1,4 @@
-import {parse as parseSegment, Segment, slice, SOS} from './segment';
+import { parse as parseSegment, Segment, slice, SOS } from './segment';
 
 export class JPEGFile {
   readonly segments: Array<Segment>;
@@ -11,14 +11,25 @@ export class JPEGFile {
     return `${this.segments.map(i => i.debugString()).join('\n')}`;
   }
 }
+
+function getSegmentSize(segment: Segment): number {
+  if (!(segment instanceof Segment)) {
+    return 0;
+  }
+  return segment.size + 2;
+}
+
 export function parse(data: DataView) {
+  console.info("start parsing");
   let segments: Array<Segment> = [];
   let offset = 0;
   while (offset < data.byteLength) {
+    console.debug(`offset = ${offset}`);
     const seg = parseSegment(data, offset);
+    console.debug(seg?.debugString());
     if (seg != null) {
       segments.push(seg);
-      offset += seg.size;
+      offset += getSegmentSize(seg);
       if (seg instanceof SOS) {
         break;
       }
