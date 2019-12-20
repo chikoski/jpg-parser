@@ -1,4 +1,7 @@
 node_modules/*
 dist/*
+cli/*
 .DS_Store
 etc/*
+tsconfig.tsbuildinfo
+.python-version

@@ -4,9 +4,9 @@
   "description": "A parser for JPG files",
   "main": "dist/index.js",
   "scripts": {
-    "build": "webpack --config webpack.config.cjs",
-    "dev": "webpack --watch --config webpack.config.cjs",
-    "test": "node ./test/index.js"
+    "build": "tsc",
+    "dev": "tsc --build tsconfig.cli.json --watch",
+    "test": "node ./cli/cli/index.js etc/000.jpg"
   },
   "keywords": [
     "JPEG"
@@ -19,6 +19,5 @@
     "typescript": "^3.7.3",
     "webpack": "^4.41.4",
     "webpack-cli": "^3.3.10"
-  },
-  "type": "module"
+  }
 }
