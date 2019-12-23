@@ -5,3 +5,4 @@ cli/*
 etc/*
 tsconfig.tsbuildinfo
 .python-version
+glitched*/*

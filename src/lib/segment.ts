@@ -37,6 +37,12 @@ export class SOF extends Segment {
   }
 }
 
+export class SOF0 extends SOF {
+  debugString() {
+    return `SOF0(${this.width} x ${this.height})`;
+  }
+}
+
 export class APP extends Segment {
   get type() {
     return this.marker & 0x0F;
@@ -61,11 +67,26 @@ export class SOS extends Segment {
   }
 }
 
+export class DQT extends Segment {
+  debugString() {
+    return `DQT`
+  }
+}
+
+export class DHT extends Segment {
+  debugString() {
+    return `DHT`;
+  }
+}
+
 const markerSegmentTable = new Map([
   [0xD8, SOI],
-  [0xC0, SOF],
+  [0xC0, SOF0],
+  [0xC1, SOF],
+  [0xC4, DHT],
   [0xD9, EOI],
   [0xDA, SOS],
+  [0xDB, DQT],
   [0xE0, APP],
   [0xE1, APP],
   [0xE2, APP],
@@ -78,6 +99,8 @@ const markerSegmentTable = new Map([
   [0xE9, APP],
   [0xEA, APP],
   [0xEB, APP],
+  [0xEC, APP],
+  [0xED, APP],
   [0xEE, APP],
   [0xEF, APP],
 ]);
@@ -95,7 +118,7 @@ export function slice(data: DataView, offset: number, size: number): DataView {
   return new DataView(data.buffer, data.byteOffset + offset, size);
 }
 
-export function parse(data: DataView, offset = 0): Segment|null {
+export function parse(data: DataView, offset = 0): Segment | null {
   const marker = [data.getUint8(offset), data.getUint8(offset + 1)];
   if (isSegment(marker[0])) {
     const Klass = resolve(marker[1]);

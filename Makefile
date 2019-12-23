@@ -17,4 +17,8 @@ clean: partial-clean
 partial-clean::
 	rm -rf $(DIST)
 
+partial-clean::
+	rm -rf glitched
+	rm -rf glitched_*
+
 .PHONY: all build dev test clean partial-clean
