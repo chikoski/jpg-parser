@@ -1,12 +1,15 @@
-import path from "path";
-import oldfs from "fs";
-import { parse, JPEGFile } from "../lib/index";
-import { glitch } from "./glitch";
+import oldfs from 'fs';
+import path from 'path';
+
+import {JPEGFile, parse} from '../lib/index';
+
+import {glitch} from './glitch';
 
 const fs = oldfs.promises;
 
 function normalize(mayFullPath: string): string {
-  return mayFullPath[0] === "/" ? mayFullPath : path.resolve(process.cwd(), mayFullPath);
+  return mayFullPath[0] === '/' ? mayFullPath :
+                                  path.resolve(process.cwd(), mayFullPath);
 }
 
 async function read(file: string): Promise<DataView> {
@@ -27,7 +30,7 @@ async function findAvailableDataStoreName(basename: string): Promise<string> {
   if (!await exists(basename)) {
     return basename;
   }
-  for (let i = 0; ; i++) {
+  for (let i = 0;; i++) {
     const name = `${basename}_${i}`;
     if (!await exists(name)) {
       return name;
@@ -35,7 +38,7 @@ async function findAvailableDataStoreName(basename: string): Promise<string> {
   }
 }
 
-async function createDataStore(basename = "glitched"): Promise<string> {
+async function createDataStore(basename = 'glitched'): Promise<string> {
   const name = await findAvailableDataStoreName(basename);
   await fs.mkdir(name);
   return name;
@@ -45,12 +48,11 @@ async function glitchNTimes(src: JPEGFile, n: number) {
   const dir = await createDataStore();
   const digits = (Math.log(n) / Math.log(10)) | 0 + 1;
   while (n > 0) {
-    const filename = `${n}`.padStart(digits, "0");
+    const filename = `${n}`.padStart(digits, '0');
     const fullPath = path.resolve(process.cwd(), dir, `${filename}.jpg`);
     const result = glitch(src);
     if (result != null) {
-      const buffer = new Buffer(result.rawData.buffer);
-      console.log(buffer);
+      const buffer = Buffer.from(result.rawData.buffer);
       await fs.writeFile(fullPath, buffer);
     }
     n--;
