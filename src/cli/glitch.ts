@@ -34,13 +34,13 @@ function breakImageData(data: DataView, trial = 10) {
   trial = Math.max(trial, 0);
   while (trial > 0) {
     const indices = [
-      generateRandomIndexWith(0, data.byteLength),
-      generateRandomIndexWith(0, data.byteLength)
+      generateRandomIndexWith(0, data.byteLength - 1),
+      generateRandomIndexWith(0, data.byteLength - 1)
     ];
     const size = (Math.min(1024, data.byteLength) * Math.random()) | 0;
     for (let offset = 0; offset < size; offset++) {
-      const value = data.getUint8(indices[0] + offset);
       try {
+        const value = data.getUint8(indices[0] + offset);
         data.setUint8(indices[1], value);
       } catch (e) {
       }

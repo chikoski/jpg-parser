@@ -66,7 +66,7 @@ async function main(args: Array<string>) {
     const jpg = parse(data);
     if (jpg != null) {
       console.debug(jpg.debugString());
-      glitchNTimes(jpg, 10);
+      glitchNTimes(jpg, 100);
     }
   }
 }
