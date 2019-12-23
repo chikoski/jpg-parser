@@ -1,21 +1,11 @@
-const path = require("path");
+const path = require('path');
 
 module.exports = {
-  mode: "development",
+  mode: 'development',
   entry: {
-    "lib": "./src/index.ts",
-    "cli": "./src/cli/index.ts"
+    'lib': './src/lib/index.ts',
   },
-  output: {
-    path: path.resolve(__dirname, "./dist"),
-    filename: "[name].js"
-  },
-  module: {
-    rules: [
-      { test: /\.ts$/, use: "ts-loader" }
-    ]
-  },
-  resolve: {
-    extensions: [".ts", ".js"]
-  }
+  output: {path: path.resolve(__dirname, './dist'), filename: '[name].js'},
+  module: {rules: [{test: /\.ts$/, use: 'ts-loader'}]},
+  resolve: {extensions: ['.ts', '.js']}
 };

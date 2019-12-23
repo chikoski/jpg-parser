@@ -5,6 +5,7 @@ all: build
 
 build:
 	npm run build
+	npm run prod
 
 dev: 
 	npm run dev
