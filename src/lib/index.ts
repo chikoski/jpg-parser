@@ -1,20 +1,31 @@
-import { parse as parseSegment, Segment, slice, SOS, SOI, EOI, DQT, DHT } from './segment';
+import {DHT, DQT, EOI, parse as parseSegment, Segment, slice, SOF, SOI, SOS} from './segment';
 
-export { DQT, DHT, Segment } from "./segment";
+export {DHT, DQT, Segment} from './segment';
 
 export class JPEGFile {
   readonly segments: Array<Segment>;
-  readonly scanArea: DataView;
+  readonly imageData: DataView;
   readonly rawData: DataView;
   readonly DQT: Array<DQT>;
-  readonly DHT: Array<DHT>
-  constructor(rawData: DataView, segments: Array<Segment>, dqt: Array<DQT>, dht: Array<DHT>, scanArea: DataView) {
+  readonly DHT: Array<DHT>;
+  readonly SOF: SOF;
+
+  constructor(conf: ParseResult) {
+    const {segments, imageData, sof, dqt, dht, rawData} = conf;
     this.segments = segments;
-    this.scanArea = scanArea;
+    this.imageData = imageData;
+    this.SOF = sof;
     this.DQT = dqt;
     this.DHT = dht;
     this.rawData = rawData;
   }
+  get width(): number {
+    return this.SOF.width;
+  }
+  get height(): number {
+    return this.SOF.height;
+  }
+
   debugString() {
     return `${this.segments.map(i => i.debugString()).join('\n')}`;
   }
@@ -29,17 +40,22 @@ function getSegmentSize(segment: Segment): number {
 
 class IR {
   soi: SOI;
-  eoi: EOI | null = null;
+  sof: SOF|null = null;
+  eoi: EOI|null = null;
   dqt: Array<DQT> = [];
   dht: Array<DHT> = [];
   segments: Array<Segment> = [];
-  scanArea: DataView | null = null;
+  imageData: DataView|null = null;
+  rawData: DataView|null = null;
   constructor(soi: SOI) {
     this.soi = soi;
     this.segments.push(soi);
   }
   add(seg: Segment) {
     this.segments.push(seg);
+    if (seg instanceof SOF) {
+      this.sof = seg;
+    }
     if (seg instanceof DQT) {
       this.dqt.push(seg);
     }
@@ -52,8 +68,12 @@ class IR {
   }
 }
 
-export function parse(data: DataView): JPEGFile | null {
-  console.info("start parsing");
+interface ParseResult {
+  sof: SOF, dht: Array<DHT>, dqt: Array<DQT>, segments: Array<Segment>,
+      imageData: DataView, rawData: DataView
+}
+
+export function parse(data: DataView): JPEGFile|null {
   const soi = parseSegment(data, 0);
   if (!(soi instanceof SOI)) {
     return null;
@@ -84,10 +104,11 @@ export function parse(data: DataView): JPEGFile | null {
   if (eoi != null) {
     ir.add(eoi);
   }
-  ir.scanArea = slice(data, offset, end - offset);
-  const rawData = slice(data, 0, data.byteLength);
-  if (ir.eoi != null && ir.scanArea != null && rawData != null) {
-    return new JPEGFile(rawData, ir.segments, ir.dqt, ir.dht, ir.scanArea);
+  ir.imageData = slice(data, offset, end - offset);
+  ir.rawData = slice(data, 0, data.byteLength);
+  if (ir.eoi != null && ir.sof != null && ir.imageData != null &&
+      ir.rawData != null) {
+    return new JPEGFile(ir as ParseResult);
   }
   return null;
 }
